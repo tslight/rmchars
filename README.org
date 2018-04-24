@@ -1,4 +1,4 @@
-#+TITLE: REMOVE INVALID CHARACTERS IN FILE & DIRECTORY NAMES
+#+TITLE: REMOVE INVALID CHARACTERS
 #+AUTHOR: Toby slight
 
 Script to workaround limitations of Egnyte file system character
