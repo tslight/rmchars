@@ -1,0 +1,5 @@
+#+TITLE: REMOVE INVALID CHARACTERS IN FILE & DIRECTORY NAMES
+#+AUTHOR: Toby slight
+
+Script to workaround limitations of Egnyte file system character
+assignment.
