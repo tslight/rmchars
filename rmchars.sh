@@ -1,23 +1,23 @@
 #!/usr/bin/env bash
 
 # Define colors to be used when echoing output
-NC=`tput sgr0`;
-BLACK=`tput setaf 0`;
-RED=`tput setaf 1`;
-GREEN=`tput setaf 2`;
-YELLOW=`tput setaf 3`;
-BLUE=`tput setaf 4`;
-MAGENTA=`tput setaf 5`;
-CYAN=`tput setaf 6`;
-WHITE=`tput setaf 7`;
+readonly NC=$(tput sgr0);
+readonly BLACK=$(tput setaf 0);
+readonly RED=$(tput setaf 1);
+readonly GREEN=$(tput setaf 2);
+readonly YELLOW=$(tput setaf 3);
+readonly BLUE=$(tput setaf 4);
+readonly MAGENTA=$(tput setaf 5);
+readonly CYAN=$(tput setaf 6);
+readonly WHITE=$(tput setaf 7);
 
-CHARS=("\\" "/" "\"" ":" "<" ">" "\^" "|" "*" "?" "+"); # escape backslash and quote
-LOG="$HOME/$(basename $0)-$(date '+%Y-%m-%d').log"
+readonly CHARS=("\\" "/" "\"" ":" "<" ">" "\\^" "|" "*" "?" "+"); # escape backslash and quote
+readonly LOG="$HOME/$(basename "$0")-$(date '+%Y-%m-%d').log"
 
 # function that echos help page.
 usage () {
-    echo -n "
-$(basename $0) [OPTION] [DIRECTORY]
+    echo "
+$(basename "$0") [OPTION] [DIRECTORY]
 
 This script must run with one of the following options.
 
@@ -37,23 +37,22 @@ Please pass this command a directory to operate on.
 
 Example:
 
-$(basename $0) -a /path/to/my/directory
-
+$(basename "$0") -a /path/to/my/directory
 "
 }
 
 # function that checks if argument variable is set, and then whether
 # or not it's a valid directory.
 checkdir () {
-    if [ ! -z "$1" ]; then
-	if [ -d "$1" ]; then
+    local dir="$1"
+
+    if [ ! -z "$dir" ]; then
+	if [ -d "$dir" ]; then
 	    return 0;
-	    break;
 	else
 	    echo;
 	    echo "${RED}INVALID DIRECTORY.${NC}";
 	    return 1;
-	    break;
 	fi
     else
 	return 1;
@@ -64,21 +63,19 @@ checkdir () {
 # enters valid answer.  returns 0 for yes, 1 for no or quit, and an
 # error message for anything else (before re-looping)
 ask () {
-    while :
-    do
-	read -e -p "$1" ans;
-	case $ans in
+    local question="$1" ans
+
+    while :; do
+	read -n 1 -rep "$question" ans;
+	case "$ans" in
 	    [yY]*)
 		return 0
-		break
 		;;
 	    [nN]*)
 		return 1
-		break
 		;;
 	    [qQ]*)
 		exit 1
-		break
 		;;
 	    *)
 		echo "${RED}You must enter either y or n to continue.${NC}";
@@ -126,7 +123,9 @@ rmchars () {
     #
     # Finally we pipe to sed to get rid of the directory depth
     # numbering.
-    find  $1 -type $2 -printf "%d %p\n" | sort -n | tac | sed 's/^[0-9]* //'|\
+    local path="$1" type="$2" opt="$3" oldbase newbase dir c f
+
+    find "$path" -type "$type" -printf "%d %p\\n" | sort -n | tac | sed 's/^[0-9]* //'|\
 	while IFS= read -r f; do
 
 	    oldbase=$(basename "$f");
@@ -141,14 +140,16 @@ rmchars () {
 		# and double escape them when piping to sed.
 		if [ "$c" == "\\" ]; then
 		    if echo "$newbase" | grep -q -F "$c"; then
-			newbase=$(echo "$newbase" | sed "s/\\$c//g");
+			# newbase=$(echo "$newbase" | sed "s/\\$c//g");
+			newbase=${newbase//\\"$c"/}
 		    fi
 		else
 		    # We need to always quote the element variable
 		    # call, as parameter and filename expansion does
 		    # funny things..
 		    if echo "$newbase" | grep -q "$c"; then
-			newbase=$(echo "$newbase" | sed "s/$c//g");
+			# newbase=$(echo "$newbase" | sed "s/$c//g");
+			newbase=${newbase//"$c"/}
 		    fi
 		fi
 	    done
@@ -161,7 +162,7 @@ rmchars () {
 	    # we also need to loop until the search condition is nil,
 	    # to catch the case where we have spaces followed by dots,
 	    # or visa versa
-	    while echo "$newbase" | egrep -q "^+ | +$|\.+$"; do
+	    while echo "$newbase" | grep -Eq "^+ | +$|\\.+$"; do
 		newbase=$(echo "$newbase" | sed 's/^[ \t]*//;s/[ \t]*$//;s/\.*$//');
 	    done
 
@@ -177,12 +178,13 @@ rmchars () {
 		if [ -e "$new" ]; then
 		    i=0;
 		    while [ -e "$new-$i" ]; do
-			let i++;
+			# let i++;
+			((i++))
 		    done
 		    new="$new-$i";
 		fi
 
-		case $3 in
+		case "$opt" in
 		    a)
 			question="Do you want to rename ${GREEN}$f${NC} to ${YELLOW}$new${NC}? "
 			# One downside to piping find into a while
@@ -197,7 +199,7 @@ rmchars () {
 			ask "$question" < /dev/tty && mv "$f" "$new"
 			;;
 		    l)
-			mv -v "$f" "$new" >> $LOG # pipe stdout & stderr to logfile
+			mv -v "$f" "$new" >> "$LOG" # pipe stdout & stderr to logfile
 			;;
 		    t)
 			echo "Renaming ${GREEN}$f${NC} to ${YELLOW}$new${NC}"
@@ -211,59 +213,61 @@ rmchars () {
 	done
 }
 
-case "$1" in
-    -a|--ask)
-	# checkdir "$2 "&& rmchars "$2" "f" "a"; rmchars "$2" "f" "a" || usage;
-	# more readable:
-	if checkdir "$2"; then
-	    rmchars "$2" "f" "a";
-	    # check exit value of rmchars, which in turn checks return
-	    # value from ask's subshell. Otherwise entering q when ask
-	    # function called will only exit from rmchars loop not from
-	    # the script completely.
-	    #
-	    # # exit value is that returned from rmchars, and
-	    # # therefore ask, since "a" flag passed.
-	    [ $? != 0 ] && exit $?;
-	    rmchars "$2" "d" "a";
-	else
-	    usage;
-	fi
-	;;
-    -l|--log)
-	if checkdir "$2"; then
-	    echo "${CYAN}Re-directing $(basename $0) output to $LOG${NC}";
-	    echo >> $LOG;
-	    echo "TIMESTAMP: $(date '+%H:%M:%S - %A %d %B %Y')" >> $LOG;
-	    echo >> $LOG;
-	    rmchars "$2" "f" "l";
-	    rmchars "$2" "d" "l";
-	else
-	    usage;
-	fi
-	;;
-    -t|--test)
-	if checkdir "$2"; then
-	    echo "${CYAN}Running $(basename $0) simulation. No files will be changed.${NC}";
-	    rmchars "$2" "f" "t";
-	    rmchars "$2" "d" "t";
-	    echo "${CYAN}$(basename $0) simulation complete.${NC}";
-	else
-	    usage;
-	fi
-	;;
-    -y|--yes)
-	if checkdir "$2"; then
-	    rmchars "$2" "f" "y";
-	    rmchars "$2" "d" "y";
-	else
-	    usage;
-	fi
-	;;
-    -h|--help)
-	usage
-	;;
-    *)
-	usage
-	;;
-esac
+main () {
+    local opt="$1" dir="$2"
+
+    case "$opt" in
+	-a|--ask)
+	    if checkdir "$dir"; then
+		rmchars "$dir" "f" "a"
+		rmchars "$dir" "d" "a"
+	    else
+		usage;
+		exit 1
+	    fi
+	    ;;
+	-l|--log)
+	    if checkdir "$dir"; then
+		echo "${CYAN}Re-directing $(basename "$0") output to $LOG${NC}";
+		echo >> "$LOG";
+		echo "TIMESTAMP: $(date '+%H:%M:%S - %A %d %B %Y')" >> "$LOG";
+		echo >> "$LOG";
+		rmchars "$dir" "f" "l";
+		rmchars "$dir" "d" "l";
+	    else
+		usage;
+		exit 1
+	    fi
+	    ;;
+	-t|--test)
+	    if checkdir "$dir"; then
+		echo "${CYAN}Running $(basename "$0") simulation. No files will be changed.${NC}";
+		rmchars "$dir" "f" "t";
+		rmchars "$dir" "d" "t";
+		echo "${CYAN}$(basename "$0") simulation complete.${NC}";
+	    else
+		usage;
+		exit 1
+	    fi
+	    ;;
+	-y|--yes)
+	    if checkdir "$dir"; then
+		rmchars "$dir" "f" "y";
+		rmchars "$dir" "d" "y";
+	    else
+		usage;
+		exit 1
+	    fi
+	    ;;
+	-h|--help)
+	    usage
+	    exit 0
+	    ;;
+	*)
+	    usage
+	    exit 1
+	    ;;
+    esac
+}
+
+main "$@"
