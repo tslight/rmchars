@@ -32,11 +32,10 @@ def getargs():
 
 def mknames(name):
     names = []
-    for i in range(10):
+    for i in range(len(chars)):
         newname = name + str(i)
-        for c in chars:
-            newname = " " + c + " " + newname + " " + c + " "
-        newname = "   " + newname + "   "
+        newname = chars[i] + " " + newname + " " + chars[i]
+        newname = "  " + newname + "  "
         names.append(newname)
 
     return names
@@ -46,17 +45,27 @@ def mknodes(path):
     dirs = mknames("testdir")
     files = mknames("testfile")
     for d in dirs:
-        if not os.path.exists(d):
-            os.mkdir(os.path.join(path, d))
+        dirpath = os.path.join(path, d)
+        if not os.path.exists(dirpath):
+            os.mkdir(dirpath)
     for f in files:
-        if not os.path.exists(f):
-            open(os.path.join(path, f), 'a').close()
+        filepath = os.path.join(path, f)
+        if not os.path.exists(filepath):
+            open(filepath, 'a').close()
+
+
+def recurse(path):
+    for d in os.listdir(path):
+        dirpath = os.path.join(path, d)
+        if os.path.isdir(dirpath):
+            mknodes(dirpath)
 
 
 def main():
     args = getargs()
     path = os.path.abspath(args.path)
     mknodes(path)
+    recurse(path)
 
 
 if __name__ == '__main__':
