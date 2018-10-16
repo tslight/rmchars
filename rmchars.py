@@ -1,3 +1,6 @@
+# Copyright (c) 2018, Toby Slight. All rights reserved.
+# ISC License (ISCL) - see LICENSE file for details.
+
 import argparse
 import os
 from yorn import ask
@@ -50,6 +53,8 @@ def rename_path(root, name, args):
             print("TESTING: {} to {}".format(oldpath, newpath))
         elif args.quiet:
             os.rename(oldpath, newpath)
+        elif args.find:
+            print(oldpath)
 
 
 def getargs():
@@ -67,6 +72,8 @@ def getargs():
                        help="preform a dry run to see what would be renamed")
     group.add_argument("-q", "--quiet", action="store_true",
                        help="run silently")
+    group.add_argument("-f", "--find", action="store_true",
+                       help="print a list of invalid paths")
     parser.add_argument("path", type=chkpath, nargs='?',
                         default=".", help="a valid path")
     return parser.parse_args()
