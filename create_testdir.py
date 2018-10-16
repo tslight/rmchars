@@ -71,8 +71,8 @@ def recurse(path, count):
         dirpath = os.path.join(path, d)
         if os.path.isdir(dirpath) and count < 4:
             mknodes(dirpath)
+            count = count + 1
             recurse(dirpath, count)
-        count = count + 1
 
 
 def main():
