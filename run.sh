@@ -10,7 +10,9 @@ getelcs () {
 
 getcreds () {
     read -re -p "Enter your Egnyte Admin username: " USER
-    read -res -p "Enter you Egnyte Admin password: " PASS
+    read -res -p "Enter you Egnyte Admin password: " pass
+    PASS=$(printf '%q' "$pass") # escape special bash chars
+    # PASS=${PASS// /\\ } # escape spaces
 }
 
 chkdir () {
