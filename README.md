@@ -12,14 +12,28 @@ W.I.P Powershell version...
 
 ## INSTALLATION
 
-`pip install treepick`
+`pip install rmchars`
 
 ## CLI USAGE
 
 ```
+usage: rmchars [-h] (-i | -a | -t | -q | -f) [path]
+
+Remove invalid characters from a given path.
+
+positional arguments:
+  path               a valid path
+
+optional arguments:
+  -h, --help         show this help message and exit
+  -i, --interactive  prompt before renaming each path
+  -a, --automate     rename each path without prompting
+  -t, --dry_run      preform a dry run to see what would be renamed
+  -q, --quiet        run silently
+  -f, --find         print a list of invalid paths
 ```
 
 ## TODO
 
-- [ ] ~~Add char list to config file~~
-- [ ] ~~Finish Powershell version~~
+- [ ] Add char list to config file
+- [ ] Finish Powershell version

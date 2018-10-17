@@ -8,7 +8,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="rmchars",
-    version="0.0.1",
+    version="0.0.3",
     author="Toby Slight",
     author_email="tobyslight@gmail.com",
     description="Recursively remove invalid characters from path names.",
