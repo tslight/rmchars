@@ -1,5 +1,0 @@
-#+TITLE: REMOVE INVALID CHARACTERS
-#+AUTHOR: Toby slight
-
-Script to workaround limitations of Egnyte file system character
-assignment.

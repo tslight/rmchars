@@ -3,9 +3,7 @@
 
 import argparse
 import os
-from yorn import ask
-
-chars = ["\\", "/", "\"", ":", "<", ">", "^", "|", "*", "?", "+"]
+from .rmchars import rename_path
 
 
 def chkpath(path):
@@ -21,40 +19,6 @@ def chkpath(path):
         msg = "{0} does not exist.".format(path)
 
     raise argparse.ArgumentTypeError(msg)
-
-
-def replace_chars(name):
-    """
-    iterate over & delete invalid characters in name.
-    """
-    for c in chars:
-        name = name.replace(c, "")
-        name = name.strip()
-    return name
-
-
-def rename_path(root, name, args):
-    # found = re.search(re.escape("|".join(chars), name))
-    # https://stackoverflow.com/a/5858943
-    # any + generator is more robust
-    found = any(c in name for c in chars)
-    if found:
-        oldpath = os.path.join(root, name)
-        newpath = os.path.join(root, replace_chars(name))
-        if args.interactive:
-            question = "Would you like to rename " + \
-                oldpath + " to " + newpath + " ? "
-            if ask(question):
-                os.rename(oldpath, newpath)
-        elif args.automate:
-            print("RENAMING: {} to {}".format(oldpath, newpath))
-            os.rename(oldpath, newpath)
-        elif args.dry_run:
-            print("TESTING: {} to {}".format(oldpath, newpath))
-        elif args.quiet:
-            os.rename(oldpath, newpath)
-        elif args.find:
-            print(oldpath)
 
 
 def getargs():
@@ -82,6 +46,7 @@ def getargs():
 def main():
     args = getargs()
     path = os.path.abspath(args.path)
+
     for root, dirs, files in os.walk(path, topdown=False):
         for name in files:
             rename_path(root, name, args)

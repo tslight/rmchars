@@ -75,7 +75,7 @@ def recurse(path, count):
             recurse(dirpath, count)
 
 
-def main():
+def create_rmchars_testdir():
     args = getargs()
     path = os.path.abspath(args.path)
     mknodes(path)
@@ -83,4 +83,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    create_rmchars_testdir()
