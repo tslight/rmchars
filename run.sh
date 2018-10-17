@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 
-MOUNTS=()
+DIR=$(dirname "$0")
+LOG="$DIR/rmchars.log"
 ELCLIST="$HOME/.ELC.lst"
+MOUNTS=()
 
 getelcs () {
     # https://stackoverflow.com/a/11394045
@@ -27,9 +29,9 @@ chkdir () {
 
     if [[ ! -d "$dir" ]]; then
 	if mkdir -p "$dir"; then
-	    echo "Successfully created $dir"
+	    echo "Successfully created $dir" | tee -a "$LOG"
 	else
-	    echo "Failed to create $dir"
+	    echo "Failed to create $dir" | tee -a "$LOG"
 	fi
     fi
 }
@@ -39,13 +41,13 @@ mntelc () {
 
     if ! mount | grep -Eq "$elc.*$MNT"; then
 	getshare "$elc"
-	if mount -t smbfs "$SHARE" "$MNT" &> /dev/null; then
-	    echo "Successfully mounted $elc at $MNT"
+	if mount -t smbfs "$SHARE" "$MNT" &>> "$LOG"; then
+	    echo "Successfully mounted $elc at $MNT" | tee -a "$LOG"
 	else
-	    echo "Failed to mount $elc at $MNT"
+	    echo "Failed to mount $elc at $MNT" | tee -a "$LOG"
 	fi
     else
-	echo "$elc already mounted at $MNT"
+	echo "$elc already mounted at $MNT" | tee -a "$LOG"
     fi
 }
 
@@ -64,7 +66,7 @@ main () {
     done
 
     for mnt in "${MOUNTS[@]}"; do
-	rmchars "$args" "$mnt"
+	rmchars "$args" "$mnt" | tee -a "$LOG"
     done
 }
 
