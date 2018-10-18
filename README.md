@@ -1,17 +1,20 @@
 # RECURSIVELY REMOVE INVALID CHARS IN PATHS
 
 A simple script to find and remove invalid characters in file and directory
-names. Inspired by the need to workaround limitations of Egnyte ELC character
-assignment.
+names. Inspired by the need to workaround limitations of [Egnyte's unsupported character
+types] (https://helpdesk.egnyte.com/hc/en-us/articles/201637074-Unsupported-Characters-and-File-Types).
 
 The chars are currently hardcoded into the script, but like the list of servers
-to run on, this should really be added to a config file.
+to run on, this should really be added to a config/lst file.
 
 The aforementioned list should reside in $HOME/.ELC.lst. The format is one line
 per server and lines beginning with # will be ignored.
 
 There is a really convoluted bash version and a nice simple Python version and a
 W.I.P Powershell version...
+
+run.sh is a bash wrapper script for mounting a list of servers to run the python
+script on.
 
 ## INSTALLATION
 
@@ -38,5 +41,6 @@ optional arguments:
 
 ## TODO
 
+- [x] ~~Add support for unicode and control characters~~
 - [ ] Add char list to config file
 - [ ] Finish Powershell version
