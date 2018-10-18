@@ -10,9 +10,6 @@ chars = ["\\", "/", "\"", ":", "<", ">", "^", "|", "*", "?"]
 # http://www.unicode.org/reports/tr44/#GC_Values_Table
 uchars = ["Lo", "So", "Cc"]  # Other_Letter, Other_Symbol, Control_Character
 
-# The following link may come in handy at some point:
-# https://stackoverflow.com/questions/4324790/removing-control-characters-from-a-string-in-python
-
 
 def replace_chars(name):
     """
@@ -31,6 +28,7 @@ def replace_chars(name):
         #         name = name.replace(name[next_char_index], "")
         #     name = name.replace(c, "")
 
+        # https://stackoverflow.com/questions/4324790/removing-control-characters-from-a-string-in-python
         if unicodedata.category(c) in uchars:
             name = name.replace(c, "")
 
