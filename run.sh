@@ -59,14 +59,9 @@ main () {
 
     for elc in "${ELCS[@]}"; do
 	MNT="/Volumes/ELCS/$elc"
-	MOUNTS+=("$MNT")
-
 	chkdir "$MNT"
 	mntelc "$elc" "$MNT"
-    done
-
-    for mnt in "${MOUNTS[@]}"; do
-	rmchars "$args" "$mnt" | tee -a "$LOG"
+	rmchars "$args" "$MNT" | tee -a "$LOG"
     done
 }
 
