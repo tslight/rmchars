@@ -3,9 +3,15 @@
 
 import os
 import sys
+import unicodedata
 from yorn import ask
 
-chars = ["\\", "/", "\"", ":", "<", ">", "^", "|", "*", "?", "+"]
+chars = ["\\", "/", "\"", ":", "<", ">", "^", "|", "*", "?"]
+# http://www.unicode.org/reports/tr44/#GC_Values_Table
+uchars = ["Lo", "So", "Cc"]  # Other_Letter, Other_Symbol, Control_Character
+
+# The following link may come in handy at some point:
+# https://stackoverflow.com/questions/4324790/removing-control-characters-from-a-string-in-python
 
 
 def replace_chars(name):
@@ -14,10 +20,20 @@ def replace_chars(name):
     """
 
     for c in name:
-        if c in chars or (isinstance(c, str) and sys.getsizeof(c) > 3):
+        if c in chars:
+            name = name.replace(c, "")
+        if unicodedata.category(c) in uchars:
             name = name.replace(c, "")
 
-    name = name.strip()
+        # u = c.encode('unicode_escape')  # get unicode encoding
+        # if len(u) > 4:  # not as simple as it sounds!
+        #     # some unicode characters take up two ascii chars.... what a world..
+        #     next_char_index = name.index(c) + 1
+        #     if next_char_index < len(name):
+        #         name = name.replace(name[next_char_index], "")
+        #     name = name.replace(c, "")
+
+    name = name.strip()  # remove leading and trailing spaces
 
     if name.endswith("."):
         name = name[:-1]  # remove last char
@@ -25,12 +41,19 @@ def replace_chars(name):
     return name
 
 
+def is_invalid(name, invalid=False):
+    for c in name:
+        if c in chars or unicodedata.category(c) in uchars:
+            invalid = True
+    return invalid
+
+
 def rename_path(root, name, args):
     # found = re.search(re.escape("|".join(chars), name))
     # https://stackoverflow.com/a/5858943
     # any + generator is more robust
-    found = any(c in name for c in chars)
-    if found:
+    # char_found = any(c in name for c in chars)
+    if is_invalid(name):
         oldpath = os.path.join(root, name)
         newpath = os.path.join(root, replace_chars(name))
         if args.interactive:

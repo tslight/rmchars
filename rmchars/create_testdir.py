@@ -2,9 +2,9 @@ import argparse
 import os
 
 if os.name == 'nt':
-    chars = ['/', '"', ':', '<', '>', '^', '|', '*', '?', '+']
+    chars = ['/', '"', ':', '<', '>', '^', '|', '*', '?']
 else:
-    chars = ['\\', '"', ':', '<', '>', '^', '|', '*', '?', '+']
+    chars = ['\\', '"', ':', '<', '>', '^', '|', '*', '?']
 
 
 def chkpath(path):
@@ -40,8 +40,8 @@ def mknames(name):
     names = []
     for i in range(len(chars)):
         newname = name + str(i)
-        newname = chars[i] + " . " + u'\u1F61C' + \
-            newname + u'\u1F608' + " . " + chars[i]
+        newname = chars[i] + " . " + "😇" + \
+            newname + "😠" + " . " + chars[i]
         newname = " . " + newname + " . "
         names.append(newname)
 
