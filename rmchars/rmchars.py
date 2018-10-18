@@ -2,6 +2,7 @@
 # ISC License (ISCL) - see LICENSE file for details.
 
 import os
+import sys
 from yorn import ask
 
 chars = ["\\", "/", "\"", ":", "<", ">", "^", "|", "*", "?", "+"]
@@ -11,9 +12,16 @@ def replace_chars(name):
     """
     iterate over & delete invalid characters in name.
     """
-    for c in chars:
-        name = name.replace(c, "")
-        name = name.strip()
+
+    for c in name:
+        if c in chars or (isinstance(c, str) and sys.getsizeof(c) > 3):
+            name = name.replace(c, "")
+
+    name = name.strip()
+
+    if name.endswith("."):
+        name = name[:-1]  # remove last char
+
     return name
 
 

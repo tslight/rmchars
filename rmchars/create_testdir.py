@@ -40,8 +40,9 @@ def mknames(name):
     names = []
     for i in range(len(chars)):
         newname = name + str(i)
-        newname = chars[i] + " " + newname + " " + chars[i]
-        newname = "  " + newname + "  "
+        newname = chars[i] + " . " + u'\u1F61C' + \
+            newname + u'\u1F608' + " . " + chars[i]
+        newname = " . " + newname + " . "
         names.append(newname)
 
     return names
