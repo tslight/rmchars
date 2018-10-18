@@ -17,6 +17,7 @@ chkpy () {
 	    fi
 	else
 	    echo "No pip3... Is python3 installed?" | tee -a "$LOG"
+	    exit 1
 	fi
     fi
 }
