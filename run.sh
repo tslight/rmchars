@@ -1,18 +1,40 @@
 #!/usr/bin/env bash
 
+ELCS=()
+ELCLIST="$HOME/.ELC.lst"
 DIR=$(dirname "$0")
 LOG="$DIR/rmchars.log"
-ELCLIST="$HOME/.ELC.lst"
-MOUNTS=()
+
+chkpy () {
+    if ! command -v rmchars &> /dev/null; then
+	echo "rmchars not installed. Attempting to install..." | tee -a "$LOG"
+	if command -v pip3 &> /dev/null; then
+	    if pip3 install rmchars &> "$LOG"; then
+		echo "Successfully installed rmchars." | tee -a "$LOG"
+	    else
+		echo "Failed to install rmchars." | tee -a "$LOG"
+		exit 1
+	    fi
+	else
+	    echo "No pip3... Is python3 installed?" | tee -a "$LOG"
+	fi
+    fi
+}
 
 getelcs () {
     # https://stackoverflow.com/a/11394045
-    IFS=$'\n' read -d '' -r -a ELCS < "$ELCLIST"
+    # IFS=$"\n" read -d "" -r -a ELCS < "$ELCLIST"
+    # https://stackoverflow.com/a/19219860
+    while IFS=$"\n" read line; do
+	if ! [[ "$line" =~ \#.* ]]; then
+	    ELCS+=("$line")
+	fi
+    done < "$ELCLIST"
 }
 
 getcreds () {
     read -re -p "Enter your Egnyte Admin username: " USER
-    read -res -p "Enter you Egnyte Admin password: " PASS
+    read -res -p "Enter you Egnyte Admin password: " PASS; echo
     # USER=$(printf '%q' "$user") # escape special bash chars
     # PASS=$(printf '%q' "$pass") # escape special bash chars
 }
@@ -37,31 +59,38 @@ chkdir () {
 }
 
 mntelc () {
-    local elc="$1" MNT="$2"
+    local elc="$1" mntpt="$2"
 
-    if ! mount | grep -Eq "$elc.*$MNT"; then
+    if ! mount | grep -Eq "$elc.*$mntpt"; then
 	getshare "$elc"
-	if mount -t smbfs "$SHARE" "$MNT" &>> "$LOG"; then
-	    echo "Successfully mounted $elc at $MNT" | tee -a "$LOG"
+	if mount -t smbfs "$SHARE" "$mntpt" &>> "$LOG"; then
+	    echo "Successfully mounted $elc at $mntpt" | tee -a "$LOG"
 	else
-	    echo "Failed to mount $elc at $MNT" | tee -a "$LOG"
+	    echo "Failed to mount $elc at $mntpt" | tee -a "$LOG"
 	fi
     else
-	echo "$elc already mounted at $MNT" | tee -a "$LOG"
+	echo "$elc already mounted at $mntpt" | tee -a "$LOG"
     fi
 }
 
 main () {
-    local args="$*" MNT
+    local args="$*" mntpt
+
+    chkpy
+
+    if [[ "$args" == "" ]]; then
+	rmchars --help
+	exit 1
+    fi
 
     getelcs
     getcreds
 
     for elc in "${ELCS[@]}"; do
-	MNT="/Volumes/ELCS/$elc"
-	chkdir "$MNT"
-	mntelc "$elc" "$MNT"
-	rmchars "$args" "$MNT" | tee -a "$LOG"
+	mntpt="/Volumes/ELCS/$elc"
+	chkdir "$mntpt"
+	mntelc "$elc" "$mntpt"
+	rmchars "$args" "$mntpt" | tee -a "$LOG"
     done
 }
 
