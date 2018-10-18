@@ -7,6 +7,9 @@ assignment.
 The chars are currently hardcoded into the script, but like the list of servers
 to run on, this should really be added to a config file.
 
+The aforementioned list should reside in $HOME/.ELC.lst. The format is one line
+per server and lines beginning with # will be ignored.
+
 There is a really convoluted bash version and a nice simple Python version and a
 W.I.P Powershell version...
 
