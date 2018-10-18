@@ -3,7 +3,14 @@
 ELCS=()
 ELCLIST="$HOME/.ELC.lst"
 DIR=$(dirname "$0")
-LOG="$DIR/rmchars.log"
+LOG="$DIR/rmchars-$(date +%Y-%m-%d.%H).log"
+
+chkroot() {
+    if [ "$(id -u)" -ne 0 ]; then
+	echo "This script must be run as root or with sudo."
+	exit 1
+    fi
+}
 
 chkpy () {
     if ! command -v rmchars &> /dev/null; then
@@ -63,6 +70,7 @@ mntelc () {
     local elc="$1" mntpt="$2"
 
     if ! mount | grep -Eq "$elc.*$mntpt"; then
+	getcreds
 	getshare "$elc"
 	if mount -t smbfs "$SHARE" "$mntpt" &>> "$LOG"; then
 	    echo "Successfully mounted $elc at $mntpt" | tee -a "$LOG"
@@ -77,6 +85,7 @@ mntelc () {
 main () {
     local args="$*" mntpt
 
+    chkroot
     chkpy
 
     if [[ "$args" == "" ]]; then
@@ -85,7 +94,6 @@ main () {
     fi
 
     getelcs
-    getcreds
 
     for elc in "${ELCS[@]}"; do
 	mntpt="/Volumes/ELCS/$elc"
