@@ -22,8 +22,6 @@ def replace_chars(name):
     for c in name:
         if c in chars:
             name = name.replace(c, "")
-        if unicodedata.category(c) in uchars:
-            name = name.replace(c, "")
 
         # u = c.encode('unicode_escape')  # get unicode encoding
         # if len(u) > 4:  # not as simple as it sounds!
@@ -33,10 +31,13 @@ def replace_chars(name):
         #         name = name.replace(name[next_char_index], "")
         #     name = name.replace(c, "")
 
-    name = name.strip()  # remove leading and trailing spaces
+        if unicodedata.category(c) in uchars:
+            name = name.replace(c, "")
 
-    if name.endswith("."):
-        name = name[:-1]  # remove last char
+        name = name.strip()  # remove leading and trailing spaces
+
+        if name.endswith("."):
+            name = name[:-1]  # remove last char
 
     return name
 
