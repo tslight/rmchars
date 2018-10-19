@@ -1,8 +1,8 @@
 # RECURSIVELY REMOVE INVALID CHARS IN PATHS
 
 A simple script to find and remove invalid characters in file and directory
-names. Inspired by the need to workaround limitations of [Egnyte's unsupported character
-types] (https://helpdesk.egnyte.com/hc/en-us/articles/201637074-Unsupported-Characters-and-File-Types).
+names. Inspired by the need to workaround limitations of [Egnyte's unsupported
+character types](https://helpdesk.egnyte.com/hc/en-us/articles/201637074-Unsupported-Characters-and-File-Types).
 
 The chars are currently hardcoded into the script, but like the list of servers
 to run on, this should really be added to a config/lst file.
