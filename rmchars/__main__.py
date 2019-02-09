@@ -1,9 +1,11 @@
-# Copyright (c) 2018, Toby Slight. All rights reserved.
-# ISC License (ISCL) - see LICENSE file for details.
-
+"""
+Copyright (c) 2018, Toby Slight. All rights reserved.
+ISC License (ISCL) - see LICENSE file for details.
+"""
 import argparse
 import os
-from .rmchars import rename_path
+from .check import get_paths
+from .actions import rename, interactive, dryrun
 
 
 def chkpath(path):
@@ -17,7 +19,6 @@ def chkpath(path):
             msg = "{0} is not a directory.".format(path)
     else:
         msg = "{0} does not exist.".format(path)
-
     raise argparse.ArgumentTypeError(msg)
 
 
@@ -36,22 +37,42 @@ def getargs():
                        help="preform a dry run to see what would be renamed")
     group.add_argument("-q", "--quiet", action="store_true",
                        help="run silently")
-    group.add_argument("-f", "--find", action="store_true",
-                       help="print a list of invalid paths")
     parser.add_argument("path", type=chkpath, nargs='?',
                         default=".", help="a valid path")
     return parser.parse_args()
 
 
+def process_args(root, name, args):
+    """
+    Get new and old paths then check how to process based on args.
+    """
+    paths = get_paths(root, name)
+    if paths:
+        oldpath = paths[0]
+        newpath = paths[1]
+        if args.interactive:
+            interactive(oldpath, newpath)
+        elif args.automate:
+            rename(oldpath, newpath),
+        elif args.dry_run:
+            dryrun(oldpath, newpath)
+        elif args.quiet:
+            os.rename(oldpath, newpath)
+
+
 def main():
+    """
+    Reverse walk the filesystem, ending at given path, renaming files
+    and then directories as we go.
+    """
     args = getargs()
     path = os.path.abspath(args.path)
 
     for root, dirs, files in os.walk(path, topdown=False):
         for name in files:
-            rename_path(root, name, args)
+            process_args(root, name, args)
         for name in dirs:
-            rename_path(root, name, args)
+            process_args(root, name, args)
 
 
 if __name__ == '__main__':
