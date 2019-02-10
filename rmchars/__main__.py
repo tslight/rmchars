@@ -9,18 +9,14 @@ from .check import is_invalid, get_paths
 from .create import create
 
 
-def chkpath(path):
+def chkdir(path):
     """
     Checks for valid directory path.
     """
-    if os.path.exists(path):
-        if os.path.isdir(path):
-            return path
-        else:
-            msg = "{0} is not a directory.".format(path)
-    else:
-        msg = "{0} does not exist.".format(path)
-    raise argparse.ArgumentTypeError(msg)
+    if not os.path.isdir(path):
+        msg = "{} is not a directory.".format(path)
+        raise argparse.ArgumentTypeError(msg)
+    return path
 
 
 def getargs():
@@ -40,7 +36,7 @@ def getargs():
                        help="run silently")
     group.add_argument("-c", "--create", action="store", type=int,
                        help="create test directories")
-    parser.add_argument("path", type=chkpath, nargs='?',
+    parser.add_argument("path", type=chkdir, nargs='?',
                         default=".", help="a valid path")
     return parser.parse_args()
 
