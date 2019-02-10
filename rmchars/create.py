@@ -42,24 +42,12 @@ def mknodes(path):
             open(filepath, 'a').close()
 
 
-def recurse(path, count):
+def create(path, count, limit):
     """
     Descend into one of the directories to create 4 levels of children.
     """
     for root, dirs, files in os.walk(path):
-        if count < 4:
+        if count < limit:
             mknodes(root)
             count = count + 1
-            recurse(root, count)
-
-    # for d in sorted(os.listdir(path)):
-    #     dirpath = os.path.join(path, d)
-    #     if os.path.isdir(dirpath) and count < len(CHARS):
-    #         mknodes(dirpath)
-    #         count = count + 1
-    #         recurse(dirpath, count)
-
-
-def create(path):
-    # mknodes(path)
-    recurse(path, 0)
+            create(root, count, limit)

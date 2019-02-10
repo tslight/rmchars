@@ -38,7 +38,7 @@ def getargs():
                        help="preform a dry run to see what would be renamed")
     group.add_argument("-q", "--quiet", action="store_true",
                        help="run silently")
-    group.add_argument("-c", "--create", action="store_true",
+    group.add_argument("-c", "--create", action="store", type=int,
                        help="create test directories")
     parser.add_argument("path", type=chkpath, nargs='?',
                         default=".", help="a valid path")
@@ -69,7 +69,7 @@ def main():
     args = getargs()
     path = os.path.abspath(args.path)
     if args.create:
-        create(path)
+        create(path, 0, args.create)
     else:
         for root, dirs, files in os.walk(path, topdown=False):
             for name in files:
