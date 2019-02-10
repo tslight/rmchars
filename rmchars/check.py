@@ -42,7 +42,6 @@ def get_paths(root, name):
     """
     If is_invalid returns true get a new name using replace_chars
     """
-    if is_invalid(name):
-        oldpath = os.path.join(root, name)
-        newpath = os.path.join(root, replace_chars(name))
-        return (oldpath, newpath)
+    oldpath = os.path.join(root, name)
+    newpath = os.path.join(root, replace_chars(name))
+    return (oldpath, newpath)

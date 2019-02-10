@@ -4,8 +4,9 @@ ISC License (ISCL) - see LICENSE file for details.
 """
 import argparse
 import os
-from .check import get_paths
 from .actions import rename, interactive, dryrun
+from .check import is_invalid, get_paths
+from .create import create
 
 
 def chkpath(path):
@@ -37,6 +38,8 @@ def getargs():
                        help="preform a dry run to see what would be renamed")
     group.add_argument("-q", "--quiet", action="store_true",
                        help="run silently")
+    group.add_argument("-c", "--create", action="store_true",
+                       help="create test directories")
     parser.add_argument("path", type=chkpath, nargs='?',
                         default=".", help="a valid path")
     return parser.parse_args()
@@ -46,10 +49,8 @@ def process_args(root, name, args):
     """
     Get new and old paths then check how to process based on args.
     """
-    paths = get_paths(root, name)
-    if paths:
-        oldpath = paths[0]
-        newpath = paths[1]
+    if is_invalid(name):
+        oldpath, newpath = get_paths(root, name)
         if args.interactive:
             interactive(oldpath, newpath)
         elif args.automate:
@@ -67,12 +68,14 @@ def main():
     """
     args = getargs()
     path = os.path.abspath(args.path)
-
-    for root, dirs, files in os.walk(path, topdown=False):
-        for name in files:
-            process_args(root, name, args)
-        for name in dirs:
-            process_args(root, name, args)
+    if args.create:
+        create(path)
+    else:
+        for root, dirs, files in os.walk(path, topdown=False):
+            for name in files:
+                process_args(root, name, args)
+            for name in dirs:
+                process_args(root, name, args)
 
 
 if __name__ == '__main__':
