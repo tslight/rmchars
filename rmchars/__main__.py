@@ -54,7 +54,7 @@ def process_args(root, name, args):
         if args.interactive:
             interactive(oldpath, newpath)
         elif args.automate:
-            rename(oldpath, newpath),
+            rename(oldpath, newpath)
         elif args.dry_run:
             dryrun(oldpath, newpath)
         elif args.quiet:
