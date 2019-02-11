@@ -19,6 +19,24 @@ def chkdir(path):
     return path
 
 
+def chkint(number):
+    """
+    Sanity check integer to use as a depth level for creating test directories.
+    """
+    try:
+        number = int(number)
+    except ValueError:
+        msg = "{} is not a valid integer.".format(number)
+        raise argparse.ArgumentTypeError(msg)
+    if number < 1:
+        msg = "{} is less than 1!".format(number)
+        raise argparse.ArgumentTypeError(msg)
+    if number > 15:
+        msg = "{} is too large... 15 MAX!".format(number)
+        raise argparse.ArgumentTypeError(msg)
+    return number
+
+
 def getargs():
     """
     Return a list of valid arguments. If no argument is given, default to $PWD.
@@ -34,7 +52,7 @@ def getargs():
                        help="preform a dry run to see what would be renamed")
     group.add_argument("-q", "--quiet", action="store_true",
                        help="run silently")
-    group.add_argument("-c", "--create", type=int,
+    group.add_argument("-c", "--create", type=chkint,
                        help="Create test directories to a specified depth.")
     parser.add_argument("path", type=chkdir, nargs='?',
                         default=".", help="a valid path")

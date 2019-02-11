@@ -44,10 +44,16 @@ def mknodes(path):
 
 def create(path, count, limit):
     """
-    Descend into one of the directories to create 4 levels of children.
+    Descend into directories to create children of specified depth.
     """
+    mknodes(path)
     for root, dirs, files in os.walk(path):
-        if count < limit:
-            mknodes(root)
-            count = count + 1
-            create(root, count, limit)
+        if limit < 5:  # creates depth level recursively in all directories....
+            if count < limit:
+                count = count + 1
+                for d in dirs:
+                    create(os.path.join(root, d), count, limit)
+        else:  # if more than 5, limit to one directory, as it will take too long...
+            if count < limit:
+                count = count + 1
+                create(root, count, limit)
