@@ -34,8 +34,8 @@ def getargs():
                        help="preform a dry run to see what would be renamed")
     group.add_argument("-q", "--quiet", action="store_true",
                        help="run silently")
-    group.add_argument("-c", "--create", action="store", type=int,
-                       help="create test directories")
+    group.add_argument("-c", "--create", type=int,
+                       help="Create test directories to a specified depth.")
     parser.add_argument("path", type=chkdir, nargs='?',
                         default=".", help="a valid path")
     return parser.parse_args()
