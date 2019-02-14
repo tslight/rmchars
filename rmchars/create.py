@@ -53,7 +53,7 @@ def create(path, count, limit):
                 count = count + 1
                 for d in dirs:
                     create(os.path.join(root, d), count, limit)
-        else:  # if more than 5, limit to one directory, as it will take too long...
+        else:  # if more than 4, limit to one directory, as it will take too long...
             if count < limit:
                 count = count + 1
                 create(root, count, limit)

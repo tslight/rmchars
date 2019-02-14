@@ -4,6 +4,7 @@ ISC License (ISCL) - see LICENSE file for details.
 """
 import argparse
 import os
+import multiprocessing
 from .actions import rename, interactive, dryrun
 from .check import is_invalid, get_paths
 from .create import create
